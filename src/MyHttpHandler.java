@@ -3,13 +3,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 public class MyHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
-            if("product".equals(httpExchange.getRequestURI().toString().split("\\/")[1])) {
+            if("products".equals(httpExchange.getRequestURI().toString().split("\\/")[1])) {
                 requestParamValue = handleGetRequest(httpExchange);
             }
         }else if("POST".equals(httpExchange.getRequestMethod())) {
@@ -18,8 +19,8 @@ public class MyHttpHandler implements HttpHandler {
         handleResponse(httpExchange, requestParamValue);
     }
     private String handleGetRequest(HttpExchange httpExchange) {
-        String name = Controller.getName();
-        return name;
+        List<Product> name =  Controller.getProducts();
+        return name.toString();
 //            return httpExchange.
 //                    getRequestURI()
 //                    .toString()

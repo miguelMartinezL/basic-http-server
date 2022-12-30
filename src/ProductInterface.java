@@ -1,4 +1,5 @@
-
+import java.util.ArrayList;
+import java.util.List;
 public interface ProductInterface {
-    String getName();
+    List<Product> findAll();
 }

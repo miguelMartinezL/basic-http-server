@@ -1,8 +1,10 @@
+import java.util.List;
+
 public class Controller {
+    private ProductInterface productService;
 
-    public static String getName(){
-        String name = "productName";
-
-        return name;
+    public List<Product> getProducts() {
+        List<Product> list = productService.findAll();
+        return list;
     }
 }

@@ -7,20 +7,24 @@ import java.io.OutputStream;
 public class MyHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String requestParamValue=null;
+        String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
-            requestParamValue = handleGetRequest(httpExchange);
+            if("product".equals(httpExchange.getRequestURI().toString().split("\\/")[1])) {
+                requestParamValue = handleGetRequest(httpExchange);
+            }
         }else if("POST".equals(httpExchange.getRequestMethod())) {
             requestParamValue= handlePostRequest(httpExchange);
         }
         handleResponse(httpExchange, requestParamValue);
     }
     private String handleGetRequest(HttpExchange httpExchange) {
-            return httpExchange.
-                    getRequestURI()
-                    .toString()
-                    .split("\\?")[1]
-                    .split("=")[1];
+        String name = Controller.getName();
+        return name;
+//            return httpExchange.
+//                    getRequestURI()
+//                    .toString()
+//                    .split("\\?")[1]
+//                    .split("=")[1];
     }
 
     private String handlePostRequest(HttpExchange httpExchange) {
@@ -32,24 +36,20 @@ public class MyHttpHandler implements HttpHandler {
     }
     private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException{
         OutputStream outputStream = httpExchange.getResponseBody();
-//        StringBuilder htmlBuilder = new StringBuilder();
-//
-//        htmlBuilder.append("<html>").
-//                append("<body>").
-//                append("<h1>").
-//                append("Hello ")
-//                .append(requestParamValue)
-//                .append("</h1>")
-//                .append("</body>")
-//                .append("</html>");
-//        // encode HTML content
-//        String htmlResponse = StringEscapeUtils.escapeHtml4(htmlBuilder.toString());
-        String htmlResponse = "<html> <body> <h1> Hello " + requestParamValue + "</h1> </body> </html>";
+        if(!requestParamValue.isEmpty()) {
+            String htmlResponse = "<html> <body> <h1> Hello " + requestParamValue + "</h1> </body> </html>";
 
-        // this line is a must
-        httpExchange.sendResponseHeaders(200, htmlResponse.length());
-        outputStream.write(htmlResponse.getBytes());
-        outputStream.flush();
-        outputStream.close();
+            // this line is a must
+            httpExchange.sendResponseHeaders(200, htmlResponse.length());
+            outputStream.write(htmlResponse.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } else {
+            String htmlResponse = "<html> <body> <h1> 404</h1> <p>Page not found</p> </body> </html>";
+            httpExchange.sendResponseHeaders(404, htmlResponse.length());
+            outputStream.write(htmlResponse.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        }
     }
 }

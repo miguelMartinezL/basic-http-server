@@ -6,11 +6,13 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class MyHttpHandler implements HttpHandler {
+    //Controller controller = new Controller();
+    ProductService productService = new ProductService();
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
-            if("products".equals(httpExchange.getRequestURI().toString().split("\\/")[1])) {
+            if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handleGetRequest(httpExchange);
             }
         }else if("POST".equals(httpExchange.getRequestMethod())) {
@@ -19,13 +21,9 @@ public class MyHttpHandler implements HttpHandler {
         handleResponse(httpExchange, requestParamValue);
     }
     private String handleGetRequest(HttpExchange httpExchange) {
-        List<Product> name =  Controller.getProducts();
-        return name.toString();
-//            return httpExchange.
-//                    getRequestURI()
-//                    .toString()
-//                    .split("\\?")[1]
-//                    .split("=")[1];
+        //List<Product> name = controller.getProducts();
+        List<String> name = productService.findAll();
+       return name.toString();
     }
 
     private String handlePostRequest(HttpExchange httpExchange) {

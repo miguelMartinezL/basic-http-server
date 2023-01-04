@@ -13,8 +13,12 @@ public class ProductService implements ProductInterface
         products.add(new Product(105, "Refrigerator ", "12WP9087", 10000.00, 4));
     }
 
-    public List<Product> findAll()
+    public List<String> findAll()
     {
-        return products;
+        List<String> prods = new ArrayList<>();
+        for(int i = 0; i < products.size(); i++){
+           prods.add(String.valueOf(products.get(i).getBatchno()));
+        }
+        return prods;
     }
 }

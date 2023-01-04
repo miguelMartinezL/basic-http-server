@@ -21,4 +21,9 @@ public class ProductService implements ProductInterface
         }
         return prods;
     }
+
+    public void addOne(int id, String pname, String batchno, double price, int noofproduct)
+    {
+        products.add(new Product(id,pname, batchno,price,noofproduct));
+    }
 }

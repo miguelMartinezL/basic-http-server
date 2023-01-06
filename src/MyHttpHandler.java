@@ -22,7 +22,16 @@ public class MyHttpHandler implements HttpHandler {
             if("addproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handlePostRequest(httpExchange);
             }
+        }else if ("DELETE".equals(httpExchange.getRequestMethod())) {
+            if("delproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
+                requestParamValue = handleDeleteRequest(httpExchange);
+            }
         }
+//        else if ("PUT".equals(httpExchange.getRequestMethod())) {
+//            if ("updproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
+//                requestParamValue = handleUpdateRequest(httpExchange);
+//            }
+//        }
         handleResponse(httpExchange, requestParamValue);
     }
     private String handleGetRequest(HttpExchange httpExchange) {
@@ -38,9 +47,7 @@ public class MyHttpHandler implements HttpHandler {
         BufferedReader br = new BufferedReader(isr);
         String query = br.readLine();
         parseQuery(query, parameters);
-//        for(String key: parameters.keySet()){
-//            response += key + " " + parameters.get(key) + "\n";
-//        }
+
         int id = Integer.parseInt(parameters.get("id").toString());
         String pname = parameters.get("pname").toString();
         String batchno = parameters.get("batchno").toString();
@@ -51,7 +58,31 @@ public class MyHttpHandler implements HttpHandler {
         String response = "product added";
         return response;
     }
+    private String handleDeleteRequest(HttpExchange httpExchange) throws IOException{
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
 
+        BufferedReader br = new BufferedReader(isr);
+        String query = br.readLine();
+        parseQuery(query, parameters);
+        int id = Integer.parseInt(parameters.get("id").toString());
+        boolean check = productService.deleteOne(id);
+        String response = "";
+        if (check) {
+            response = "Product Deleted";
+        }
+        return response;
+    }
+//    private String handleUpdateRequest(HttpExchange  httpExchange) throws IOException {
+//        Map<String, Object> parameters = new HashMap<String, Object>();
+//        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+//
+//        BufferedReader br = new BufferedReader(isr);
+//        String query = br.readLine();
+//        parseQuery(query, parameters);
+//        Product response = productService.update(parameters);
+//        return ;
+//    }
     public static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
 
         if (query != null){

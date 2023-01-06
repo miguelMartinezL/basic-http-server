@@ -1,5 +1,8 @@
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ProductService implements ProductInterface
 {
@@ -17,7 +20,7 @@ public class ProductService implements ProductInterface
     {
         List<String> prods = new ArrayList<>();
         for(int i = 0; i < products.size(); i++){
-           prods.add(String.valueOf(products.get(i).getBatchno()));
+           prods.add(String.valueOf(products.get(i).getId()));
         }
         return prods;
     }
@@ -26,4 +29,14 @@ public class ProductService implements ProductInterface
     {
         products.add(new Product(id,pname, batchno,price,noofproduct));
     }
+
+    public boolean deleteOne(int id)
+    {
+        boolean check = products.removeIf(product -> product.getId() == id);
+
+        //return products.get(id).getId();
+        return check;
+    }
+
+   // public Product update(Map<String, Object> parameters) {}
 }

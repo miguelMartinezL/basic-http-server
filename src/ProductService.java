@@ -20,7 +20,13 @@ public class ProductService implements ProductInterface
     {
         List<String> prods = new ArrayList<>();
         for(int i = 0; i < products.size(); i++){
-           prods.add(String.valueOf(products.get(i).getId()));
+           prods.add(String.valueOf(
+                   products.get(i).getId()
+                   + " " + products.get(i).getPname()
+                   + " " + products.get(i).getBatchno()
+                   + " " + products.get(i).getPrice()
+                   + " " + products.get(i).getNoofproduct() + "\n"
+           ));
         }
         return prods;
     }

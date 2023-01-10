@@ -16,6 +16,10 @@ public class Product {
         this.noofproduct = noofproduct;
     }
 
+    public Product() {
+
+    }
+
     public int getId() {
         return id;
     }

@@ -16,33 +16,56 @@ public class ProductService implements ProductInterface
         products.add(new Product(105, "Refrigerator ", "12WP9087", 10000.00, 4));
     }
 
-    public List<String> findAll()
+    public String findAll()
     {
-        List<String> prods = new ArrayList<>();
-        for(int i = 0; i < products.size(); i++){
-           prods.add(String.valueOf(
-                   products.get(i).getId()
-                   + " " + products.get(i).getPname()
-                   + " " + products.get(i).getBatchno()
-                   + " " + products.get(i).getPrice()
-                   + " " + products.get(i).getNoofproduct() + "\n"
-           ));
+        String prods = "{";
+        try {
+            int i = products.size();
+            for ( Product prod : products) {
+                prods += Json.parseJson(prod) + (i == 1 ? "":",");
+                i--;
+            }
+            prods += "}";
+            return prods;
+        } catch (Exception e) {
+            return "";
         }
-        return prods;
+    }
+    public String findById(int id){
+        try {
+            Product prod = products.stream().filter(product -> product.getId() == id).findFirst().get();
+            return Json.parseJson(prod);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
-    public void addOne(int id, String pname, String batchno, double price, int noofproduct)
+    public String addOne(String json)
     {
-        products.add(new Product(id,pname, batchno,price,noofproduct));
+        String response;
+        try{
+            Product newProd = Json.parseString(json, Product.class);
+            response = findById(newProd.getId());
+            if (response.isEmpty())
+            {
+                products.add(newProd);
+                response = findById(newProd.getId());
+            } else
+            {
+                response = "";
+            }
+        } catch (Exception e ){
+            return "";
+        }
+        return response;
     }
 
-    public boolean deleteOne(int id)
+    public Boolean deleteAll()
     {
-        boolean check = products.removeIf(product -> product.getId() == id);
-
-        //return products.get(id).getId();
-        return check;
+        return products.removeAll(products);
     }
-
-   // public Product update(Map<String, Object> parameters) {}
+    public Boolean deleteOne(int id)
+    {
+        return products.removeIf(product -> product.getId() == id);
+    }
 }

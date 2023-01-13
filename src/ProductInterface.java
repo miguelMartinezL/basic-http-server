@@ -3,11 +3,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductInterface {
-    List<String> findAll();
+    String findAll();
 
-    void addOne(int id, String pname, String batchno, double price, int noofproduct);
+    String findById(int id);
 
-    boolean deleteOne(int id);
+    String addOne(String json);
+
+    Boolean deleteAll();
+
+    Boolean deleteOne(int id);
 
    // Product update(Map<String, Object> parameters);
 }

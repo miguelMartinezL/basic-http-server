@@ -2,29 +2,79 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class MyHttpHandler implements HttpHandler {
-    //Controller controller = new Controller();
+    Controller controller = new Controller();
     ProductService productService = new ProductService();
-    @Override
+
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handleGetRequest(httpExchange);
             }
+            OutputStream outputStream = httpExchange.getResponseBody();
+            if(!(requestParamValue.isEmpty())) {
+                String htmlResponse =  requestParamValue;
+
+                // this line is a must
+                httpExchange.sendResponseHeaders(200, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } else {
+                String htmlResponse = "404 Not Found";
+                httpExchange.sendResponseHeaders(404, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            }
         }else if("POST".equals(httpExchange.getRequestMethod())) {
-            if("addproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
+            if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handlePostRequest(httpExchange);
+                //requestParamValue = httpExchange.getRequestURI().toString().split("//")[0];
+            }
+            OutputStream outputStream = httpExchange.getResponseBody();
+            if(!(requestParamValue.isEmpty())) {
+                String htmlResponse =  requestParamValue;
+                // this line is a must
+                httpExchange.sendResponseHeaders(201, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } else {
+                String htmlResponse = "403 Forbidden";
+                httpExchange.sendResponseHeaders(403, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
             }
         }else if ("DELETE".equals(httpExchange.getRequestMethod())) {
-            if("delproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
+            if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handleDeleteRequest(httpExchange);
+            }
+            OutputStream outputStream = httpExchange.getResponseBody();
+            if(!(requestParamValue.isEmpty())) {
+                String htmlResponse =  requestParamValue;
+
+                // this line is a must
+                httpExchange.sendResponseHeaders(200, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } else {
+                String htmlResponse = "404 Not Found";
+                httpExchange.sendResponseHeaders(404, htmlResponse.length());
+                outputStream.write(htmlResponse.getBytes());
+                outputStream.flush();
+                outputStream.close();
             }
         }
 //        else if ("PUT".equals(httpExchange.getRequestMethod())) {
@@ -32,43 +82,47 @@ public class MyHttpHandler implements HttpHandler {
 //                requestParamValue = handleUpdateRequest(httpExchange);
 //            }
 //        }
-        handleResponse(httpExchange, requestParamValue);
+      //  handleResponse(httpExchange, requestParamValue);
     }
-    private String handleGetRequest(HttpExchange httpExchange) {
-        //List<Product> name = controller.getProducts();
-        List<String> name = productService.findAll();
-       return name.toString();
+    private String handleGetRequest(HttpExchange httpExchange)
+    {
+        String uri = httpExchange.getRequestURI().toString();
+        int uriSize = httpExchange.getRequestURI().toString().length();
+        return controller.getController(uri, uriSize);
     }
 
     private String handlePostRequest(HttpExchange httpExchange) throws IOException {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+        StringBuilder jsonBuff = new StringBuilder();
+        try{
+            InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            String line = null;
+            while((line = br.readLine()) != null){
+                jsonBuff.append(line);
+            }
+        } catch (Exception e ){
+            return "error reading";
+        }
 
-        BufferedReader br = new BufferedReader(isr);
-        String query = br.readLine();
-        parseQuery(query, parameters);
-
-        int id = Integer.parseInt(parameters.get("id").toString());
-        String pname = parameters.get("pname").toString();
-        String batchno = parameters.get("batchno").toString();
-        double price = Double.parseDouble(parameters.get("price").toString());
-        int noofproduct = Integer.parseInt(parameters.get("noofproduct").toString());
-
-        productService.addOne(id, pname, batchno, price, noofproduct);
-        String response = "product added";
-        return response;
+        return controller.postController(String.valueOf(jsonBuff));
     }
     private String handleDeleteRequest(HttpExchange httpExchange) throws IOException{
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+        boolean check = false;
+        if (httpExchange.getRequestURI().toString().length() > 10) {
+            String id = httpExchange.getRequestURI().toString().split("/")[2];
+            check = productService.deleteOne(Integer.parseInt(id));
+        }
 
-        BufferedReader br = new BufferedReader(isr);
-        String query = br.readLine();
-        parseQuery(query, parameters);
-        int id = Integer.parseInt(parameters.get("id").toString());
-        boolean check = productService.deleteOne(id);
+//        Map<String, Object> parameters = new HashMap<String, Object>();
+//        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
+//
+//        BufferedReader br = new BufferedReader(isr);
+//        String query = br.readLine();
+//        parseQuery(query, parameters);
+//        int id = Integer.parseInt(parameters.get("id").toString());
+//        boolean check = productService.deleteOne(id);
         String response = "";
-        if (check) {
+        if (!check) {
             response = "Product Deleted";
         }
         return response;
@@ -122,7 +176,7 @@ public class MyHttpHandler implements HttpHandler {
     private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException{
         OutputStream outputStream = httpExchange.getResponseBody();
         if(!(requestParamValue.isEmpty())) {
-            String htmlResponse = "<html> <body> <h1> Hello " + requestParamValue + "</h1> </body> </html>";
+            String htmlResponse =  requestParamValue;
 
             // this line is a must
             httpExchange.sendResponseHeaders(200, htmlResponse.length());

@@ -1,29 +1,8 @@
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class Json {
-
-//    public static String parseText(Map<String, Object> parameters) throws Exception {
-//        Field[] names = parameters.getClass().getDeclaredFields();
-//        String str = "{";
-//        String val;
-//        int i = 1;
-//        int j = parameters.size();
-//        for (String key : parameters.keySet()){
-//            val = parameters.get(key).toString();
-//            str += "\""+ key + "\" :" + val + (i == j ? "" : ",");
-//            i++;
-//        }
-//        str += "}";
-//        System.out.println(str);
-//        return "hello";
-//    }
     public static String parseJson(Object obj) throws Exception{
         Class<?> clase = obj.getClass();
         Field[] flds =  clase.getDeclaredFields();

@@ -75,7 +75,9 @@ public class MyHttpHandler implements HttpHandler {
             int rCode = 200;
             switch(httpExchange.getRequestMethod()){
                 case "POST":
-                    rCode = 403;
+                if ("bad request".equals(Response)){
+                    rCode = 400;
+                }
             }
             httpExchange.sendResponseHeaders(rCode, Response.length());
             outputStream.write(Response.getBytes());

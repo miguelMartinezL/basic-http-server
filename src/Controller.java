@@ -35,7 +35,11 @@ public class Controller
                     return "error reading";
                 }
             String response = productService.addOne(String.valueOf(jsonBuff));
-            return (response.isEmpty() ? "product already exists": response);
+            switch(response){
+                case "": return "product already exists";
+                case "Error: parsing error": return "bad request";
+            }
+            return response;
         }
         return "";
     }

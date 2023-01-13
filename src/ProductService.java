@@ -55,7 +55,7 @@ public class ProductService implements ProductInterface
                 response = "";
             }
         } catch (Exception e ){
-            return "";
+            return "Error: parsing error";
         }
         return response;
     }

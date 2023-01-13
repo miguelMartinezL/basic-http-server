@@ -53,13 +53,14 @@ public class Json {
     }
 
     public static void main(String[] args) throws Exception {
-        String json = "{ \"id\" : 106,\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
+        //String json = "{ \"id\" : 106,\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
+        String json = "{ ,\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
         Product prod = new Product(100, "Mobile", "CLK98123", 9000.00, 6);
         String text = "id=106&pname=macbook&batchno=LKEWR67&price=80000.0&noofproduct=8";
 
         String jsonStr = Json.parseJson(prod);
 
-        Product obj = Json.parseString(jsonStr, Product.class);
+        Product obj = Json.parseString(json, Product.class);
 
         Logger logger = Logger.getLogger(Json.class.getName());
         logger.info(jsonStr);

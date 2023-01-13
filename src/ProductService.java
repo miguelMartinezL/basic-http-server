@@ -45,20 +45,27 @@ public class ProductService implements ProductInterface
         String response;
         try{
             Product newProd = Json.parseString(json, Product.class);
-            products.add(newProd);
             response = findById(newProd.getId());
+            if (response.isEmpty())
+            {
+                products.add(newProd);
+                response = findById(newProd.getId());
+            } else
+            {
+                response = "";
+            }
         } catch (Exception e ){
             return "";
         }
         return response;
     }
 
-    public boolean deleteOne(int id)
+    public Boolean deleteAll()
     {
-        boolean check = Boolean.parseBoolean(findById(id));
-
-        products.removeIf(product -> product.getId() == id);
-
-        return check;
+        return products.removeAll(products);
+    }
+    public Boolean deleteOne(int id)
+    {
+        return products.removeIf(product -> product.getId() == id);
     }
 }

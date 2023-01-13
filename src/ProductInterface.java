@@ -9,7 +9,9 @@ public interface ProductInterface {
 
     String addOne(String json);
 
-    boolean deleteOne(int id);
+    Boolean deleteAll();
+
+    Boolean deleteOne(int id);
 
    // Product update(Map<String, Object> parameters);
 }

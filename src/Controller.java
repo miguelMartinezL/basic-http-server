@@ -1,7 +1,5 @@
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 
 public class Controller
 {
@@ -16,25 +14,11 @@ public class Controller
         return productService.findAll();
     }
 
-    public String postController(InputStream body, int uriSize)
+    public String postController(InputStream body, int uriSize) throws IOException
     {
         if(uriSize < 10)
         {
-            StringBuilder jsonBuff = new StringBuilder();
-            try
-            {
-                InputStreamReader isr = new InputStreamReader(body, "utf-8");
-                BufferedReader br = new BufferedReader(isr);
-                String line;
-                while ((line = br.readLine()) != null)
-                {
-                    jsonBuff.append(line);
-                }
-            } catch (Exception e)
-                {
-                    return "error reading";
-                }
-            String response = productService.addOne(String.valueOf(jsonBuff));
+            String response = productService.addOne(Json.ioJson(body));
             switch(response){
                 case "": return "product already exists";
                 case "Error: parsing error": return "bad request";
@@ -48,9 +32,19 @@ public class Controller
     {
         if (uriSize > 10)
         {
-            int id = Integer.parseInt(uri.toString().split("/")[2]);
+            int id = Integer.parseInt(uri.split("/")[2]);
             return (productService.deleteOne(id) == true ? "Product Deleted":"");
         }
         return (productService.deleteAll() == true ? "All products Deleted":"");
+    }
+
+    public String updateController(String uri, int uriSize, InputStream body) throws IOException
+    {
+        if (uriSize > 10)
+        {
+            int id = Integer.parseInt(uri.split("/")[2]);
+            return productService.updateOne(id, Json.ioJson(body));
+        }
+        return "";
     }
 }

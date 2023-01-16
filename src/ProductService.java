@@ -1,8 +1,4 @@
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class ProductService implements ProductInterface
 {
@@ -21,7 +17,8 @@ public class ProductService implements ProductInterface
         String prods = "{";
         try {
             int i = products.size();
-            for ( Product prod : products) {
+            for ( Product prod : products)
+            {
                 prods += Json.parseJson(prod) + (i == 1 ? "":",");
                 i--;
             }
@@ -67,5 +64,17 @@ public class ProductService implements ProductInterface
     public Boolean deleteOne(int id)
     {
         return products.removeIf(product -> product.getId() == id);
+    }
+
+    public String updateOne(int id, String obj)
+    {
+        try{
+            Product updated = Json.parseString(obj, Product.class);
+            int index = products.indexOf(products.stream().filter(product -> product.getId() == id).findFirst().get());
+            products.set(index, updated);
+            return findById(id);
+        } catch (Exception e){
+            return e.toString();
+        }
     }
 }

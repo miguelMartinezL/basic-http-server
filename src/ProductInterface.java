@@ -13,5 +13,6 @@ public interface ProductInterface {
 
     Boolean deleteOne(int id);
 
-   // Product update(Map<String, Object> parameters);
+    String updateOne(int id, String obj);
+
 }

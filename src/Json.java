@@ -1,8 +1,31 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 public class Json {
+
+    public static String ioJson(InputStream obj) throws IOException
+    {
+        StringBuilder jsonBuff = new StringBuilder();
+        try
+        {
+            InputStreamReader isr = new InputStreamReader(obj, "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+                jsonBuff.append(line);
+            }
+            return String.valueOf(jsonBuff);
+        } catch (Exception e)
+        {
+            return e.toString();
+        }
+    }
     public static String parseJson(Object obj) throws Exception{
         Class<?> clase = obj.getClass();
         Field[] flds =  clase.getDeclaredFields();
@@ -14,7 +37,7 @@ public class Json {
             if(flds[i].getType().getSimpleName().equals("String")){
                 val = "\"" + val + "\"";
             }
-            str += "\"" + flds[i].getName().toString()+ "\" :" + val + (i < flds.length - 1 ? ",": "");
+            str += "\"" + flds[i].getName()+ "\" :" + val + (i < flds.length - 1 ? ",": "");
         }
         str += "}";
         return str;

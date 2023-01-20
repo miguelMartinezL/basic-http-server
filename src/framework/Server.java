@@ -1,12 +1,17 @@
+package framework;
+
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 public class Server {
-    public static void main(String[] args) throws Exception {
+    public void run()
+    {}
+    public void start() throws IOException {
         final int port = 8001;
         final String hostName = "localhost";
         HttpServer server = HttpServer.create( new InetSocketAddress(hostName, port), 0);
@@ -17,6 +22,6 @@ public class Server {
         server.setExecutor(threadPoolExecutor);
         server.start();
         Logger logger = Logger.getLogger(Server.class.getName());
-        logger.info(" Server started on port: " + port);
+        logger.info(" framework.Server started on port: " + port);
     }
 }

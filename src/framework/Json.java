@@ -1,9 +1,15 @@
+package framework;
+
+import netscape.javascript.JSException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class Json {
@@ -37,7 +43,7 @@ public class Json {
             if(flds[i].getType().getSimpleName().equals("String")){
                 val = "\"" + val + "\"";
             }
-            str += "\"" + flds[i].getName()+ "\" :" + val + (i < flds.length - 1 ? ",": "");
+            str += "\"" + flds[i].getName()+ "\":" + val + (i < flds.length - 1 ? ",": "");
         }
         str += "}";
         return str;
@@ -76,22 +82,37 @@ public class Json {
     }
 
     public static void main(String[] args) throws Exception {
-        //String json = "{ \"id\" : 106,\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
-        String json = "{ ,\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
-        Product prod = new Product(100, "Mobile", "CLK98123", 9000.00, 6);
-        String text = "id=106&pname=macbook&batchno=LKEWR67&price=80000.0&noofproduct=8";
-
-        String jsonStr = Json.parseJson(prod);
-
-        Product obj = Json.parseString(json, Product.class);
-
-        Logger logger = Logger.getLogger(Json.class.getName());
-        logger.info(jsonStr);
-
-        logger.info("Product: " + obj.getId() + " "
-                + obj.getPname() + " "
-                + obj.getBatchno() + " "
-                + obj.getPrice() + " "
-                + obj.getNoofproduct());
-    }
+        String json = "{\"id\":106,\"pname\":\"macbook\",\"batchno\":\"LKEWR67\",\"price\":80000,\"noofproduct\":8}";
+        //String json = "{\"pname\" : \"macbook\", \"batchno\" : \"LKEWR67\", \"price\" : 80000, \"noofproduct\" : 8}";
+//        Product prod = new Product(100,"Mobile","CLK98123",9000.00,6);
+//
+//        String jsonStr = Json.parseJson(prod);
+//
+//        Product obj = Json.parseString(jsonStr, Product.class);
+//
+//        Map<String, Object> mapa = Json.mapJson(json);
+//        Field field;
+//        for (String key : mapa.keySet()){
+//           //Stream<Field> field =  Arrays.stream(fields).filter(name -> name.equals(key));
+//            try {
+//                field = obj.getClass().getDeclaredField(key);
+//                field.setAccessible(true);
+//                field.set(obj, mapa.get(key));
+//            } catch (Exception e) {
+//                System.out.println(e);
+//            }
+//
+//        }
+//
+//
+//        Logger logger = Logger.getLogger(Json.class.getName());
+//
+//        logger.info(jsonStr);
+//
+//        logger.info("application.Product: " + obj.getId() + " "
+//                + obj.getPname() + " "
+//                + obj.getBatchno() + " "
+//                + obj.getPrice() + " "
+//                + obj.getNoofproduct());
+   }
 }

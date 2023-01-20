@@ -1,3 +1,7 @@
+package application;
+
+import framework.Json;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,7 +37,7 @@ public class Controller
         if (uriSize > 10)
         {
             int id = Integer.parseInt(uri.split("/")[2]);
-            return (productService.deleteOne(id) == true ? "Product Deleted":"");
+            return (productService.deleteOne(id) == true ? "application.Product Deleted":"");
         }
         return (productService.deleteAll() == true ? "All products Deleted":"");
     }

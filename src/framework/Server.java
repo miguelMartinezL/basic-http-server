@@ -2,6 +2,8 @@ package framework;
 
 import com.sun.net.httpserver.HttpServer;
 import framework.handler.MyHttpHandler;
+import framework.annotation.*;
+import framework.context.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,8 +12,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 public class Server {
-    public void run()
-    {}
+    public void run(Class<?> source, String... args)
+    {
+        ScanApp scan = source.getAnnotation(ScanApp.class);
+        String[] packages = scan.packages();
+        context.init(packages);
+    }
     public void start() throws IOException {
         final int port = 8001;
         final String hostName = "localhost";

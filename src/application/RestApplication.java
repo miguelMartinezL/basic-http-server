@@ -8,6 +8,7 @@ import java.io.IOException;
 public class RestApplication {
     public static void main(String[] args) throws IOException {
         Server server = new Server();
+        server.run(RestApplication.class,args);
         server.start();
     }
 }

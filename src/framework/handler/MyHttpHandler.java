@@ -3,6 +3,7 @@ import application.Controller;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
+import java.util.List;
 
 public class MyHttpHandler implements HttpHandler {
     Controller controller = new Controller();
@@ -28,7 +29,7 @@ public class MyHttpHandler implements HttpHandler {
         }
         handleResponse(httpExchange, requestParamValue);
     }
-    private String handleGetRequest(HttpExchange httpExchange)
+    private List handleGetRequest(HttpExchange httpExchange)
     {
         String uri = httpExchange.getRequestURI().toString();
         int uriSize = httpExchange.getRequestURI().toString().length();

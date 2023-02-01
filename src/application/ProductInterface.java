@@ -5,16 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductInterface {
-    String findAll();
+    List get();
 
-    String findById(int id);
+    Product get(int id);
 
-    String addOne(String json);
+    boolean add(Product newProd);
 
-    Boolean deleteAll();
+    boolean delete(int id);
 
-    Boolean deleteOne(int id);
-
-    String updateOne(int id, String obj);
+    boolean update(int id, Product prod);
 
 }

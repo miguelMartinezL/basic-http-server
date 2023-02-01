@@ -16,7 +16,7 @@ public class Server {
     {
         ScanApp scan = source.getAnnotation(ScanApp.class);
         String[] packages = scan.packages();
-        context.init(packages);
+        Context.init(packages);
     }
     public void start() throws IOException {
         final int port = 8001;

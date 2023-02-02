@@ -1,8 +1,14 @@
 package framework.context;
 
-public class ComponentScanner {
+import java.io.*;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
-    public void scan(){
+public class ComponentScanner {
+    Map<Class, Object> context = new HashMap<>();
+    public static void scan(String[] packages) throws IOException {
         // iterar por el sistema de archivos
         // cada vez que encuentre un archivo .java
         /* pasamos ese nombre de archivo al class loader
@@ -13,7 +19,23 @@ public class ComponentScanner {
          1. un mapa (contexto) que la llave sea el objeto class y  el objeto como tal sea la instanci de esa clase
          Map< Class, Object>
          @Autowired busca la clase en el contexto de la aplicacion
-
         * */
+        for(String pack : packages){
+            String path = pack.replace('.','/');
+            ClassLoader cLoader = Thread.currentThread().getContextClassLoader();
+            Enumeration<URL> resources = cLoader.getResources(path);
+            File f;
+            while(resources.hasMoreElements()){
+                URL url = resources.nextElement();
+                System.out.println(url.toString());
+                f = new File(url.getFile());
+                File[] files = f.listFiles();
+                for(File file : files){
+                    if(file.getName().endsWith(".class"))
+                    System.out.println(file.getName());
+                }
+
+            }
+        }
     }
 }

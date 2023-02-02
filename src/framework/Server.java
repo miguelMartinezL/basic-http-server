@@ -12,11 +12,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 public class Server {
-    public void run(Class<?> source, String... args)
+    public void run(Class<?> source, String... args) throws IOException
     {
         ScanApp scan = source.getAnnotation(ScanApp.class);
         String[] packages = scan.packages();
         Context.init(packages);
+        ComponentScanner.scan(packages);
     }
     public void start() throws IOException {
         final int port = 8001;

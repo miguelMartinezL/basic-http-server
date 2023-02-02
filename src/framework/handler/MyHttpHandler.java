@@ -1,20 +1,23 @@
 package framework.handler;
 import application.Controller;
+import application.NewController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
 import java.util.List;
 
 public class MyHttpHandler implements HttpHandler {
-    Controller controller = new Controller();
+    NewController controller = new NewController();
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
-                requestParamValue = handleGetRequest(httpExchange);
+                requestParamValue = handleGetRequest(httpExchange).toString();
             }
-        }else if("POST".equals(httpExchange.getRequestMethod())) {
+        }
+        /*
+        else if("POST".equals(httpExchange.getRequestMethod())) {
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handlePostRequest(httpExchange);
             }
@@ -27,14 +30,16 @@ public class MyHttpHandler implements HttpHandler {
                 requestParamValue = handleUpdateRequest(httpExchange);
             }
         }
+         */
         handleResponse(httpExchange, requestParamValue);
     }
     private List handleGetRequest(HttpExchange httpExchange)
     {
         String uri = httpExchange.getRequestURI().toString();
         int uriSize = httpExchange.getRequestURI().toString().length();
-        return controller.getController(uri, uriSize);
+        return controller.getProducts();
     }
+    /*
     private String handlePostRequest(HttpExchange httpExchange) throws IOException {
         InputStream reqBody = httpExchange.getRequestBody();
         int uriSize = httpExchange.getRequestURI().toString().length();
@@ -53,7 +58,7 @@ public class MyHttpHandler implements HttpHandler {
         int uriSize = httpExchange.getRequestURI().toString().length();
         return controller.updateController(uri, uriSize, reqBody);
     }
-
+*/
     private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException{
         OutputStream outputStream = httpExchange.getResponseBody();
         if(requestParamValue.isEmpty()) {

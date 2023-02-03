@@ -1,17 +1,23 @@
+package framework.handler;
+import application.Controller;
+import application.NewController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
+import java.util.List;
 
 public class MyHttpHandler implements HttpHandler {
-    Controller controller = new Controller();
+    NewController controller = new NewController();
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestParamValue="";
         if("GET".equals(httpExchange.getRequestMethod())){
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
-                requestParamValue = handleGetRequest(httpExchange);
+                requestParamValue = handleGetRequest(httpExchange).toString();
             }
-        }else if("POST".equals(httpExchange.getRequestMethod())) {
+        }
+        /*
+        else if("POST".equals(httpExchange.getRequestMethod())) {
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handlePostRequest(httpExchange);
             }
@@ -19,20 +25,21 @@ public class MyHttpHandler implements HttpHandler {
             if("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
                 requestParamValue = handleDeleteRequest(httpExchange);
             }
+        } else if ("PUT".equals(httpExchange.getRequestMethod())) {
+            if ("products".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
+                requestParamValue = handleUpdateRequest(httpExchange);
+            }
         }
-//        else if ("PUT".equals(httpExchange.getRequestMethod())) {
-//            if ("updproduct".equals(httpExchange.getRequestURI().toString().split("/")[1])) {
-//                requestParamValue = handleUpdateRequest(httpExchange);
-//            }
-//        }
+         */
         handleResponse(httpExchange, requestParamValue);
     }
-    private String handleGetRequest(HttpExchange httpExchange)
+    private List handleGetRequest(HttpExchange httpExchange)
     {
         String uri = httpExchange.getRequestURI().toString();
         int uriSize = httpExchange.getRequestURI().toString().length();
-        return controller.getController(uri, uriSize);
+        return controller.getProducts();
     }
+    /*
     private String handlePostRequest(HttpExchange httpExchange) throws IOException {
         InputStream reqBody = httpExchange.getRequestBody();
         int uriSize = httpExchange.getRequestURI().toString().length();
@@ -45,17 +52,13 @@ public class MyHttpHandler implements HttpHandler {
         return controller.deleteController(uri, uriSize);
 
     }
-//    private String handleUpdateRequest(HttpExchange  httpExchange) throws IOException {
-//        Map<String, Object> parameters = new HashMap<String, Object>();
-//        InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "utf-8");
-//
-//        BufferedReader br = new BufferedReader(isr);
-//        String query = br.readLine();
-//        parseQuery(query, parameters);
-//        Product response = productService.update(parameters);
-//        return ;
-//    }
-
+    private String handleUpdateRequest(HttpExchange  httpExchange) throws IOException {
+        InputStream reqBody = httpExchange.getRequestBody();
+        String uri = httpExchange.getRequestURI().toString();
+        int uriSize = httpExchange.getRequestURI().toString().length();
+        return controller.updateController(uri, uriSize, reqBody);
+    }
+*/
     private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException{
         OutputStream outputStream = httpExchange.getResponseBody();
         if(requestParamValue.isEmpty()) {

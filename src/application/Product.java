@@ -1,3 +1,5 @@
+package application;
+
 public class Product {
     private int id;
     private String pname;
@@ -48,7 +50,7 @@ public class Product {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice() {
         this.price = price;
     }
 
@@ -58,5 +60,8 @@ public class Product {
 
     public void setNoofproduct(int noofproduct) {
         this.noofproduct = noofproduct;
+    }
+
+    public void setPrice(Double aDouble) {
     }
 }

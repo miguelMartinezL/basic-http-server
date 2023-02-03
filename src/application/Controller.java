@@ -4,12 +4,13 @@ import framework.Json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public class Controller
-{
+{/*
     ProductService productService = new ProductService();
 
-    public String getController(String uri, int uriSize)
+    public List getController(String uri, int uriSize)
     {
         if (uriSize > 10) {
             int id = Integer.parseInt(uri.split("/")[2]);
@@ -50,5 +51,5 @@ public class Controller
             return productService.updateOne(id, Json.ioJson(body));
         }
         return "";
-    }
+    } */
 }

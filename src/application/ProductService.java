@@ -3,6 +3,7 @@ package application;
 import framework.Json;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductService implements ProductInterface
 {
@@ -16,69 +17,31 @@ public class ProductService implements ProductInterface
         products.add(new Product(105, "Refrigerator ", "12WP9087", 10000.00, 4));
     }
 
-    public String findAll()
+    public List get()
     {
-        String prods = "{";
-        try {
-            int i = products.size();
-            for ( Product prod : products)
-            {
-                prods += Json.parseJson(prod) + (i == 1 ? "":",");
-                i--;
-            }
-            prods += "}";
-            return prods;
-        } catch (Exception e) {
-            return "";
-        }
+            return products;
+
     }
-    public String findById(int id){
-        try {
-            Product prod = products.stream().filter(product -> product.getId() == id).findFirst().get();
-            return Json.parseJson(prod);
-        } catch (Exception e) {
-            return "";
-        }
+    public Product get(int id){
+            return products.contains(products.stream().filter(product -> product.getId() == id).findFirst().get()) ?
+                    products.stream().filter(product -> product.getId() == id).findFirst().get() : null;
+
     }
 
-    public String addOne(String json)
+    public boolean add(Product newProd)
     {
-        String response;
-        try{
-            Product newProd = Json.parseString(json, Product.class);
-            response = findById(newProd.getId());
-            if (response.isEmpty())
-            {
-                products.add(newProd);
-                response = findById(newProd.getId());
-            } else
-            {
-                response = "";
-            }
-        } catch (Exception e ){
-            return "Error: parsing error";
-        }
-        return response;
+        return products.contains(newProd) ? false : products.add(newProd);
     }
 
-    public Boolean deleteAll()
-    {
-        return products.removeAll(products);
-    }
-    public Boolean deleteOne(int id)
+    public boolean delete(int id)
     {
         return products.removeIf(product -> product.getId() == id);
     }
 
-    public String updateOne(int id, String obj)
+    public boolean update(int id, Product prod)
     {
-        try{
-            Product updated = Json.parseString(obj, Product.class);
             int index = products.indexOf(products.stream().filter(product -> product.getId() == id).findFirst().get());
-            products.set(index, updated);
-            return findById(id);
-        } catch (Exception e){
-            return e.toString();
-        }
+            products.set(index, prod);
+            return products.contains(prod);
     }
 }

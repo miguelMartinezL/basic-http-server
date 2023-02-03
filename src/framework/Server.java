@@ -14,8 +14,7 @@ import java.util.logging.Logger;
 public class Server {
     public void run(Class<?> source, String... args) throws IOException {
         ScanApp scan = source.getAnnotation(ScanApp.class);
-        String[] packages = scan.packages();
-        ComponentScanner.scan(packages);
+        ComponentScanner.scan(scan.packages());
         final int port = 8001;
         final String hostName = "localhost";
         HttpServer server = HttpServer.create( new InetSocketAddress(hostName, port), 0);

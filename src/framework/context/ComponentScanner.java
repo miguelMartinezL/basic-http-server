@@ -2,13 +2,32 @@ package framework.context;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ComponentScanner {
     Map<Class, Object> context = new HashMap<>();
-    public static void scan(String[] packages) throws IOException {
+
+    public static List<Class> findFiles(File directory, String pack)
+    {
+        List<Class> classes = new ArrayList<>();
+        File[] files = directory.listFiles();
+        for (File file : files)
+        {
+            if(file.isDirectory())
+            {
+                classes.addAll(findFiles(file, pack + '.' + file.getName()));
+            } else if(file.getName().endsWith(".class"))
+            {
+                try {
+                    classes.add(Class.forName(pack + '.' + file.getName().replaceAll(".class", "")));
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return classes;
+    }
+    public static void scan(String[] packages) throws IOException{
         // iterar por el sistema de archivos
         // cada vez que encuentre un archivo .java
         /* pasamos ese nombre de archivo al class loader
@@ -21,20 +40,22 @@ public class ComponentScanner {
          @Autowired busca la clase en el contexto de la aplicacion
         * */
         for(String pack : packages){
+            ClassLoader cLoader = ClassLoader.getSystemClassLoader();
             String path = pack.replace('.','/');
-            ClassLoader cLoader = Thread.currentThread().getContextClassLoader();
+            List<Class> classes = new ArrayList<>();
             Enumeration<URL> resources = cLoader.getResources(path);
-            File f;
-            while(resources.hasMoreElements()){
+            List<File> fileAddres = new ArrayList<File>();
+            while(resources.hasMoreElements())
+            {
                 URL url = resources.nextElement();
-                System.out.println(url.toString());
-                f = new File(url.getFile());
-                File[] files = f.listFiles();
-                for(File file : files){
-                    if(file.getName().endsWith(".class"))
-                    System.out.println(file.getName());
-                }
-
+                fileAddres.add( new File(url.getFile()));
+                System.out.println(url);
+            }
+            for(File addr : fileAddres){
+                   classes.addAll(findFiles(addr,pack));
+            }
+            for (Class clase : classes){
+                System.out.println(clase.getName());
             }
         }
     }

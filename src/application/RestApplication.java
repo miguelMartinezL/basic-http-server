@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@ScanApp(packages = {"application"})
+@ScanApp(packages = {"framework","application"})
 public class RestApplication {
     public static void main(String[] args) throws IOException {
         Server server = new Server();
-        server.run(RestApplication.class,args);
-        server.start();
+        server.run(RestApplication.class, args);
     }
 }

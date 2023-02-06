@@ -1,8 +1,5 @@
 package application;
-import framework.annotation.GetMapping;
-import framework.annotation.PostMapping;
-import framework.annotation.RequestMapping;
-import framework.annotation.RestController;
+import framework.annotation.*;
 
 import java.util.List;
 
@@ -10,6 +7,7 @@ import java.util.List;
 @RequestMapping(path = "/products")
 public class NewController {
     // agregar anotacion autowired
+    @Autowired
     ProductService productService ;
     @GetMapping("/products")
     public List getProducts(){

@@ -1,11 +1,16 @@
 package framework.context;
 
+import framework.annotation.Controller;
+import framework.annotation.RestController;
+import framework.annotation.Service;
+
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.*;
 
 public class ComponentScanner {
-    Map<Class, Object> context = new HashMap<>();
+    private static Map<Class, Object> context = new HashMap<>();
 
     public static List<Class> findFiles(File directory, String pack)
     {
@@ -27,7 +32,8 @@ public class ComponentScanner {
         }
         return classes;
     }
-    public static void scan(String[] packages) throws IOException{
+    public static void scan(String[] packages) throws IOException
+    {
         // iterar por el sistema de archivos
         // cada vez que encuentre un archivo .java
         /* pasamos ese nombre de archivo al class loader
@@ -39,12 +45,14 @@ public class ComponentScanner {
          Map< Class, Object>
          @Autowired busca la clase en el contexto de la aplicacion
         * */
-        for(String pack : packages){
+        for(String pack : packages)
+        {
             ClassLoader cLoader = ClassLoader.getSystemClassLoader();
             String path = pack.replace('.','/');
             List<Class> classes = new ArrayList<>();
             Enumeration<URL> resources = cLoader.getResources(path);
             List<File> fileAddres = new ArrayList<File>();
+
             while(resources.hasMoreElements())
             {
                 URL url = resources.nextElement();
@@ -54,9 +62,24 @@ public class ComponentScanner {
             for(File addr : fileAddres){
                    classes.addAll(findFiles(addr,pack));
             }
-            for (Class clase : classes){
-                System.out.println(clase.getName());
+            for (Class cls : classes){
+                System.out.println(cls.getName());
+                if(cls.isAnnotationPresent(RestController.class) || cls.isAnnotationPresent(Service.class) || cls.isAnnotationPresent(Controller.class))
+                {
+                    Object object = null;
+                    try{
+                        Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
+                        object = objectConstructor.newInstance(null);
+
+                    } catch (Exception e){
+                        System.err.println(e);
+                    }
+                    context.put(cls, object);
+                }
             }
         }
+    }
+    public static <T> T getClass(Class<?> cls){
+        return (T) context.get(cls);
     }
 }

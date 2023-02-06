@@ -1,10 +1,12 @@
 package application;
 
 import framework.Json;
+import framework.annotation.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ProductService implements ProductInterface
 {
     private ArrayList<Product> products = new ArrayList<Product>();

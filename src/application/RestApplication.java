@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@ScanApp(packages = {"framework","application"})
+@ScanApp(packages = {"application"})
 public class RestApplication {
     public static void main(String[] args) throws IOException {
         Server server = new Server();

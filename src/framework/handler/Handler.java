@@ -7,6 +7,7 @@ import java.io.IOException;
 
 public class Handler implements HttpHandler{
 
+
     public void handle(HttpExchange httpExchange) throws IOException
     {
         switch(httpExchange.getRequestMethod().toUpperCase()){

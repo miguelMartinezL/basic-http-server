@@ -1,11 +1,14 @@
 package framework.context;
 
+import application.NewController;
+import framework.annotation.Autowired;
 import framework.annotation.Controller;
 import framework.annotation.RestController;
 import framework.annotation.Service;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
@@ -63,9 +66,9 @@ public class ComponentScanner {
                    classes.addAll(findFiles(addr,pack));
             }
             for (Class cls : classes){
-                System.out.println(cls.getName());
                 if(cls.isAnnotationPresent(RestController.class) || cls.isAnnotationPresent(Service.class) || cls.isAnnotationPresent(Controller.class))
                 {
+                    //System.out.println(cls.getName());
                     Object object = null;
                     try{
                         Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
@@ -81,5 +84,22 @@ public class ComponentScanner {
     }
     public static <T> T getClass(Class<?> cls){
         return (T) context.get(cls);
+    }
+
+    public static <T> T getAnnotation(Class<?> cls) {
+        Object obj = context.get(cls);
+        return (T) obj.getClass().getAnnotationsByType(RestController.class);
+    }
+
+    public static Map<String, Method> getMethods() {
+        Map<String, Method> methodos = new HashMap<>();
+        Method[] methods = null;
+        for(Map.Entry<Class, Object> entry : context.entrySet()){
+            methods = entry.getKey().getMethods();
+            for (Method method : methods){
+                methodos.put(method.getName(), method);
+            }
+        }
+        return  methodos;
     }
 }

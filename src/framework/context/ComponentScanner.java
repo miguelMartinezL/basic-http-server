@@ -1,10 +1,8 @@
 package framework.context;
 
 import application.NewController;
-import framework.annotation.Autowired;
-import framework.annotation.Controller;
-import framework.annotation.RestController;
-import framework.annotation.Service;
+import framework.RequestMethod;
+import framework.annotation.*;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -91,15 +89,34 @@ public class ComponentScanner {
         return (T) obj.getClass().getAnnotationsByType(RestController.class);
     }
 
-    public static Map<String, Method> getMethods() {
-        Map<String, Method> methodos = new HashMap<>();
-        Method[] methods = null;
+    public static Map<String, Class> getRestControllers() {
+        Map<String, Class> restControllers = new HashMap<>();
         for(Map.Entry<Class, Object> entry : context.entrySet()){
-            methods = entry.getKey().getMethods();
-            for (Method method : methods){
-                methodos.put(method.getName(), method);
+            if( entry.getKey().isAnnotationPresent(RestController.class))
+            {
+                restControllers.put(entry.getKey().getSimpleName(), entry.getValue().getClass());
             }
         }
-        return  methodos;
+        return  restControllers;
+    }
+
+    public static Map<String, Method> getRestControllerMethods() {
+        Map<String, Class> restControllers = getRestControllers();
+        Map<String, Method> methods = new HashMap<>();
+        for(Map.Entry<String, Class> entry : restControllers.entrySet()) {
+            RequestMapping reqMapping = (RequestMapping) entry.getValue().getAnnotation(RestController.class);
+            Method[] methList = entry.getValue().getMethods();
+            for( Method m : methList) {
+                String key = reqMapping.path();
+                if(m.isAnnotationPresent(GetMapping.class)){
+                    GetMapping getMapping = m.getAnnotation(GetMapping.class);
+                    key = RequestMethod.GET + key + getMapping.path();
+                    methods.put(key, m);
+                }
+            }
+        }
+
+
+        return methods;
     }
 }

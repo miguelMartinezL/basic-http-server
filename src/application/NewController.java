@@ -9,12 +9,12 @@ public class NewController {
     // agregar anotacion autowired
     @Autowired
     ProductService productService ;
-    @GetMapping("/")
+    @GetMapping(path = "/")
     public List getProducts(){
         return productService.get();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}")
     public Product getByid(int id) {return productService.get(id);}
 
 

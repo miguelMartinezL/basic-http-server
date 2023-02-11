@@ -27,8 +27,7 @@ public class Server {
         server.createContext("/", new Handler());
         server.setExecutor(threadPoolExecutor);
         server.start();
-        Logger logger = Logger.getLogger(Server.class.getName());
-        logger.info(" framework.Server started on port: " + port);
+        MessageLogger.info(" framework.Server started on port: " + port);
     }
     public void start() throws IOException {
 //        final int port = 8001;

@@ -1,5 +1,4 @@
 package framework.handler;
-import application.Controller;
 import application.NewController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

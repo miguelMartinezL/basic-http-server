@@ -68,25 +68,6 @@ public class ComponentScanner {
                    classes.addAll(findFiles(addr,pack));
             }
             addBean(classes);
-//            for (Class cls : classes){
-//                if(cls.isAnnotationPresent(Autowired.class))
-//                {
-//
-//                }
-//                if(cls.isAnnotationPresent(RestController.class) || cls.isAnnotationPresent(Service.class) || cls.isAnnotationPresent(Controller.class))
-//                {
-//                    System.out.println(cls.getName());
-//                    Object object = null;
-//                    try{
-//                        Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-//                        object = objectConstructor.newInstance(null);
-//
-//                    } catch (Exception e){
-//                        System.err.println(e);
-//                    }
-//                    context.put(cls, object);
-//                }
-//            }
         }
     }
 
@@ -105,33 +86,46 @@ public class ComponentScanner {
         for (Class cls : classes){
             if(cls.isAnnotationPresent(RestController.class))
             {
-                System.out.println(cls.getName());
-                Object object = null;
+                System.out.println(cls.getName());                              // <<------ printing
                 // Obtener campos y checar los que esten anotados con autowired
                 Field[] fields = cls.getDeclaredFields();
                 for(Field fld : fields)
                 {
-                    System.out.println(fld.getAnnotationsByType(Autowired.class));
-                    //System.out.println(fld.getAnnotationsByType(GetMapping.class));
-                }
-                try{
-                    Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-                    object = objectConstructor.newInstance(null);
+                    if (fld.isAnnotationPresent(Autowired.class)){
+                        System.out.println("Name: "  + fld.getType().getName()); // <<---- printing
+                        try {
+                            Class clz = Class.forName(fld.getType().getName());
+                            if (context.containsKey(clz)){
+                                Object objClz = getClass(clz);
+                            } else if (clz.isAnnotationPresent(Service.class)) {
+                                makeBean(clz);
+                                Object objClz = getClass(clz);
+                            }
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
 
-                } catch (Exception e){
-                    System.err.println(e);
+                    }
                 }
-                context.put(cls, object);
+                makeBean(cls);
             } else if (cls.isAnnotationPresent(Service.class)) {
-                try{
-                    Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-                    object = objectConstructor.newInstance(null);
-
-                } catch (Exception e){
-                    System.err.println(e);
-                }
-                context.put(cls, object);
+                System.out.println(cls.getName());                                  // <<------- printing
+                makeBean(cls);
             }
+        }
+    }
+
+    public static void makeBean(Class cls) {
+        if(!context.containsKey(cls)){
+            Object object = null;
+            try {
+                Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
+                object = objectConstructor.newInstance(null);
+
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+            context.put(cls, object);
         }
     }
 

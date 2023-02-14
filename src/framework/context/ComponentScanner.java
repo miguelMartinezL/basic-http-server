@@ -89,29 +89,47 @@ public class ComponentScanner {
                 System.out.println(cls.getName());                              // <<------ printing
                 // Obtener campos y checar los que esten anotados con autowired
                 Field[] fields = cls.getDeclaredFields();
+                makeBean(cls);
                 for(Field fld : fields)
                 {
                     if (fld.isAnnotationPresent(Autowired.class)){
+                        fld.setAccessible(true);
                         System.out.println("Name: "  + fld.getType().getName()); // <<---- printing
+                        Object objClz = null;
                         try {
                             Class clz = Class.forName(fld.getType().getName());
+                            //Object objClz = null;
                             if (context.containsKey(clz)){
-                                Object objClz = getClass(clz);
+                                objClz = getClass(clz);
                             } else if (clz.isAnnotationPresent(Service.class)) {
                                 makeBean(clz);
-                                Object objClz = getClass(clz);
+                                objClz = getClass(clz);
                             }
+                           // fld.set(getClass(cls),objClz);
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
-
+                        try {
+                            inject(fld, cls, objClz);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+
                 }
-                makeBean(cls);
+                //makeBean(cls);
             } else if (cls.isAnnotationPresent(Service.class)) {
                 System.out.println(cls.getName());                                  // <<------- printing
                 makeBean(cls);
             }
+        }
+    }
+    public static void inject(Field fld, Class cls, Object clz) throws IllegalAccessException {
+        try{
+
+            fld.set(getClass(cls), clz);
+        } catch (Exception e ){
+            MessageLogger.error(e.toString());
         }
     }
 

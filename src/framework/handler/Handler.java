@@ -17,16 +17,16 @@ public class Handler implements HttpHandler{
     public void handle(HttpExchange httpExchange) throws IOException
     {
         String reqMethod = httpExchange.getRequestMethod();
-        System.out.println(reqMethod);
+        //System.out.println(reqMethod);                              // <<------- printing
         String path = httpExchange.getRequestURI().getPath();
-        System.out.println(path);
+        //System.out.println(path);                             // <<------- printing
 
         Method method = methods.get(reqMethod + path);
-        System.out.println(method.getName());
+        //System.out.println(method.getName());                             // <<------- printing
         Class cls = method.getDeclaringClass();
-        Object controller = ComponentScanner.getClass(cls);
-        MessageLogger.info(controller.getClass().getName());
-        MessageLogger.info(method.getName());
+        Object controller = ComponentScanner.getBean(cls);
+        //MessageLogger.info(controller.getClass().getName());              // <<------- printing
+        //MessageLogger.info(method.getName());                             // <<------- printing
 
         switch(reqMethod){
             case "GET":
@@ -38,8 +38,6 @@ public class Handler implements HttpHandler{
                     outputStream.write(json.getBytes());
                     outputStream.flush();
                     outputStream.close();
-
-
                 } catch (Exception e){
                     MessageLogger.error(e.getMessage());
                 }

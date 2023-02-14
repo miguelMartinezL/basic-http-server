@@ -1,6 +1,7 @@
 package framework.context;
 
 import application.NewController;
+import application.ProductService;
 import framework.MessageLogger;
 import framework.RequestMethod;
 import framework.annotation.*;
@@ -67,30 +68,15 @@ public class ComponentScanner {
             for(File addr : fileAddres){
                    classes.addAll(findFiles(addr,pack));
             }
-            addBean(classes);
-//            for (Class cls : classes){
-//                if(cls.isAnnotationPresent(Autowired.class))
-//                {
-//
-//                }
-//                if(cls.isAnnotationPresent(RestController.class) || cls.isAnnotationPresent(Service.class) || cls.isAnnotationPresent(Controller.class))
-//                {
-//                    System.out.println(cls.getName());
-//                    Object object = null;
-//                    try{
-//                        Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-//                        object = objectConstructor.newInstance(null);
-//
-//                    } catch (Exception e){
-//                        System.err.println(e);
-//                    }
-//                    context.put(cls, object);
-//                }
-//            }
+            try {
+                addBean(classes);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public static void addBean(List<Class> classes){
+    public static void addBean(List<Class> classes) throws ClassNotFoundException {
         /* Si es RestController reviso las anotaciones sobro los fields
         si la annotación es Autowired reviso los beans para ver si ya tengo la instancia, se saca del contexto
         y se inyecta
@@ -105,43 +91,84 @@ public class ComponentScanner {
         for (Class cls : classes){
             if(cls.isAnnotationPresent(RestController.class))
             {
-                System.out.println(cls.getName());
-                Object object = null;
+                System.out.println(cls.getName());                               // <<------ printing
+                makeBean(cls);
+                Object restController = getBean(cls);
                 // Obtener campos y checar los que esten anotados con autowired
-                Field[] fields = cls.getDeclaredFields();
+                Field[] fields = restController.getClass().getDeclaredFields();
                 for(Field fld : fields)
                 {
-                    System.out.println(fld.getAnnotationsByType(Autowired.class));
-                    //System.out.println(fld.getAnnotationsByType(GetMapping.class));
+                    if (fld.isAnnotationPresent(Autowired.class)){
+                        // ################## printing
+                        System.out.println("Name: "  + fld.getType().getName());  // <<---- printing
+                        System.out.println("Name: "  + fld.getName());            // <<---- printing
+                        // #############################################
+                        Object objClz = null;
+                            try {
+                                Class clz = Class.forName(fld.getType().getName());
+                                if (context.containsKey(clz)){
+                                    objClz = getBean(clz);
+                                } else if (clz.isAnnotationPresent(Service.class)) {
+                                    makeBean(clz);
+                                    objClz = getBean(clz);
+                                }
+                            } catch (ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                            injector(restController,objClz,fld.getName());
+                    }
                 }
-                try{
-                    Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-                    object = objectConstructor.newInstance(null);
-
-                } catch (Exception e){
-                    System.err.println(e);
-                }
-                context.put(cls, object);
             } else if (cls.isAnnotationPresent(Service.class)) {
-                try{
-                    Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
-                    object = objectConstructor.newInstance(null);
-
-                } catch (Exception e){
-                    System.err.println(e);
-                }
-                context.put(cls, object);
+                System.out.println(cls.getName());                                  // <<------- printing
+                makeBean(cls);
             }
+        }
+
+//        Object rcontroller = getBean(NewController.class);
+//        Object service = getBean(ProductService.class);
+//        try {
+//            Field feld = rcontroller.getClass().getField("productService");
+//            try {
+//                feld.set(rcontroller,(ProductService) service);
+//            } catch (IllegalAccessException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//        } catch (NoSuchFieldException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    public static  void injector(Object ctrlr, Object dpndncy, String fieldName){
+        try {
+            Field feld = ctrlr.getClass().getField(fieldName);
+            try {
+                feld.set(ctrlr,(ProductService) dpndncy);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static <T> T getClass(Class<?> cls){
-        return (T) context.get(cls);
+    public static void makeBean(Class cls) {
+        if(!context.containsKey(cls)){
+            Object object = null;
+            try {
+                Constructor<?> objectConstructor = cls.forName(cls.getName()).getConstructor(null);
+                object = objectConstructor.newInstance(null);
+
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+            context.put(cls, object);
+        }
     }
 
-    public static <T> T getAnnotation(Class<?> cls) {
-        Object obj = context.get(cls);
-        return (T) obj.getClass().getAnnotationsByType(RestController.class);
+    public static <T> T getBean(Class<?> cls){
+        return (T) context.get(cls);
     }
 
     public static Map<String, Class> getRestControllers() {
@@ -171,8 +198,6 @@ public class ComponentScanner {
                 }
             }
         }
-
-
         return methods;
     }
 }

@@ -95,7 +95,7 @@ public class Json {
 //        for (String key : mapa.keySet()){
 //           //Stream<Field> field =  Arrays.stream(fields).filter(name -> name.equals(key));
 //            try {
-//                field = obj.getClass().getDeclaredField(key);
+//                field = obj.getBean().getDeclaredField(key);
 //                field.setAccessible(true);
 //                field.set(obj, mapa.get(key));
 //            } catch (Exception e) {

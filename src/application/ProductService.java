@@ -19,10 +19,10 @@ public class ProductService implements ProductInterface
         products.add(new Product(105, "Refrigerator ", "12WP9087", 10000.00, 4));
     }
 
-    public List get()
+    public String get()
     {
-            return products;
-
+        //return products;
+        return products.get(1).toString();
     }
     public Product get(int id){
             return products.contains(products.stream().filter(product -> product.getId() == id).findFirst().get()) ?

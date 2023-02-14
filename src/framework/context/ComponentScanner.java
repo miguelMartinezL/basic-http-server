@@ -1,6 +1,7 @@
 package framework.context;
 
 import application.NewController;
+import application.ProductService;
 import framework.MessageLogger;
 import framework.RequestMethod;
 import framework.annotation.*;
@@ -67,11 +68,15 @@ public class ComponentScanner {
             for(File addr : fileAddres){
                    classes.addAll(findFiles(addr,pack));
             }
-            addBean(classes);
+            try {
+                addBean(classes);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public static void addBean(List<Class> classes){
+    public static void addBean(List<Class> classes) throws ClassNotFoundException {
         /* Si es RestController reviso las anotaciones sobro los fields
         si la annotación es Autowired reviso los beans para ver si ya tengo la instancia, se saca del contexto
         y se inyecta
@@ -86,50 +91,65 @@ public class ComponentScanner {
         for (Class cls : classes){
             if(cls.isAnnotationPresent(RestController.class))
             {
-                System.out.println(cls.getName());                              // <<------ printing
-                // Obtener campos y checar los que esten anotados con autowired
-                Field[] fields = cls.getDeclaredFields();
+                System.out.println(cls.getName());                               // <<------ printing
                 makeBean(cls);
+                Object restController = getBean(cls);
+                // Obtener campos y checar los que esten anotados con autowired
+                Field[] fields = restController.getClass().getDeclaredFields();
                 for(Field fld : fields)
                 {
                     if (fld.isAnnotationPresent(Autowired.class)){
-                        fld.setAccessible(true);
-                        System.out.println("Name: "  + fld.getType().getName()); // <<---- printing
+                        // ################## printing
+                        System.out.println("Name: "  + fld.getType().getName());  // <<---- printing
+                        System.out.println("Name: "  + fld.getName());            // <<---- printing
+                        // #############################################
                         Object objClz = null;
-                        try {
-                            Class clz = Class.forName(fld.getType().getName());
-                            //Object objClz = null;
-                            if (context.containsKey(clz)){
-                                objClz = getClass(clz);
-                            } else if (clz.isAnnotationPresent(Service.class)) {
-                                makeBean(clz);
-                                objClz = getClass(clz);
+                            try {
+                                Class clz = Class.forName(fld.getType().getName());
+                                if (context.containsKey(clz)){
+                                    objClz = getBean(clz);
+                                } else if (clz.isAnnotationPresent(Service.class)) {
+                                    makeBean(clz);
+                                    objClz = getBean(clz);
+                                }
+                            } catch (ClassNotFoundException e) {
+                                throw new RuntimeException(e);
                             }
-                           // fld.set(getClass(cls),objClz);
-                        } catch (ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                        try {
-                            inject(fld, cls, objClz);
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
+                            injector(restController,objClz,fld.getName());
                     }
-
                 }
-                //makeBean(cls);
             } else if (cls.isAnnotationPresent(Service.class)) {
                 System.out.println(cls.getName());                                  // <<------- printing
                 makeBean(cls);
             }
         }
-    }
-    public static void inject(Field fld, Class cls, Object clz) throws IllegalAccessException {
-        try{
 
-            fld.set(getClass(cls), clz);
-        } catch (Exception e ){
-            MessageLogger.error(e.toString());
+//        Object rcontroller = getBean(NewController.class);
+//        Object service = getBean(ProductService.class);
+//        try {
+//            Field feld = rcontroller.getClass().getField("productService");
+//            try {
+//                feld.set(rcontroller,(ProductService) service);
+//            } catch (IllegalAccessException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//        } catch (NoSuchFieldException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    public static  void injector(Object ctrlr, Object dpndncy, String fieldName){
+        try {
+            Field feld = ctrlr.getClass().getField(fieldName);
+            try {
+                feld.set(ctrlr,(ProductService) dpndncy);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -147,13 +167,8 @@ public class ComponentScanner {
         }
     }
 
-    public static <T> T getClass(Class<?> cls){
+    public static <T> T getBean(Class<?> cls){
         return (T) context.get(cls);
-    }
-
-    public static <T> T getAnnotation(Class<?> cls) {
-        Object obj = context.get(cls);
-        return (T) obj.getClass().getAnnotationsByType(RestController.class);
     }
 
     public static Map<String, Class> getRestControllers() {
@@ -183,8 +198,6 @@ public class ComponentScanner {
                 }
             }
         }
-
-
         return methods;
     }
 }

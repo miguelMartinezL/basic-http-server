@@ -6,11 +6,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/product")
 public class NewController {
-    // agregar anotacion autowired
     @Autowired
-    ProductService productService ;
+    public ProductService productService;
     @GetMapping(path = "/")
-    public List getProducts(){
+    public String getProducts(){
         return productService.get();
     }
 

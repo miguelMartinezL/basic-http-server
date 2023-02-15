@@ -9,7 +9,7 @@ public class NewController {
     @Autowired
     public ProductService productService;
     @GetMapping(path = "/")
-    public String getProducts(){
+    public Product getProducts(){
         return productService.get();
     }
 

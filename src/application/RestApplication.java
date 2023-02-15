@@ -3,8 +3,6 @@ import framework.annotation.ScanApp;
 import framework.Server;
 
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 @ScanApp(packages = {"application"})
 public class RestApplication {

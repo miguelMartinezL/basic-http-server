@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductInterface {
-    String get();
+    Product get();
 
     Product get(int id);
 

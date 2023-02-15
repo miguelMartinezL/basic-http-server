@@ -91,18 +91,14 @@ public class ComponentScanner {
         for (Class cls : classes){
             if(cls.isAnnotationPresent(RestController.class))
             {
-                System.out.println(cls.getName());                               // <<------ printing
                 makeBean(cls);
                 Object restController = getBean(cls);
                 // Obtener campos y checar los que esten anotados con autowired
                 Field[] fields = restController.getClass().getDeclaredFields();
                 for(Field fld : fields)
                 {
+                    fld.setAccessible(true);
                     if (fld.isAnnotationPresent(Autowired.class)){
-                        // ################## printing
-                        System.out.println("Name: "  + fld.getType().getName());  // <<---- printing
-                        System.out.println("Name: "  + fld.getName());            // <<---- printing
-                        // #############################################
                         Object objClz = null;
                             try {
                                 Class clz = Class.forName(fld.getType().getName());
@@ -119,7 +115,6 @@ public class ComponentScanner {
                     }
                 }
             } else if (cls.isAnnotationPresent(Service.class)) {
-                System.out.println(cls.getName());                                  // <<------- printing
                 makeBean(cls);
             }
         }

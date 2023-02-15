@@ -16,23 +16,25 @@ public class Handler implements HttpHandler{
 
     public void handle(HttpExchange httpExchange) throws IOException
     {
+
+        for (Map.Entry<String, Method> entry : methods.entrySet()){
+            System.out.println("key = " + entry.getKey() + " " + "Method = " + entry.getValue().getName());
+        }
+
         String reqMethod = httpExchange.getRequestMethod();
-        //System.out.println(reqMethod);                              // <<------- printing
         String path = httpExchange.getRequestURI().getPath();
-        //System.out.println(path);                             // <<------- printing
+        System.out.println(reqMethod + path);
 
         Method method = methods.get(reqMethod + path);
-        //System.out.println(method.getName());                             // <<------- printing
         Class cls = method.getDeclaringClass();
         Object controller = ComponentScanner.getBean(cls);
-        //MessageLogger.info(controller.getClass().getName());              // <<------- printing
-        //MessageLogger.info(method.getName());                             // <<------- printing
+        System.out.println(controller.getClass().getSimpleName());
 
         switch(reqMethod){
             case "GET":
                 try{
                     Object obj = method.invoke(controller);
-                    String json = Json.parseJson(obj);
+                    String json = Json.toJson(obj);
                     httpExchange.sendResponseHeaders(200,json.length());
                     OutputStream outputStream = httpExchange.getResponseBody();
                     outputStream.write(json.getBytes());

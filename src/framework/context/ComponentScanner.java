@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.util.*;
 
@@ -138,7 +139,7 @@ public class ComponentScanner {
         try {
             Field feld = ctrlr.getClass().getField(fieldName);
             try {
-                feld.set(ctrlr,(ProductService) dpndncy);
+                feld.set(ctrlr, dpndncy);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -186,6 +187,15 @@ public class ComponentScanner {
             for( Method m : methList) {
                 String key = reqMapping.path();
                 if(m.isAnnotationPresent(GetMapping.class)){
+                    for(Parameter param : m.getParameters()){
+                        if(param.isAnnotationPresent(PathVariable.class)){
+                            System.out.println(m.getName());
+                            PathVariable var = param.getAnnotation(PathVariable.class);
+                            System.out.println("Value = " + var.value() + ", name = " + var.name());
+                            System.out.println(param.getName());
+                        }
+                        //System.out.println(par.getAnnotation(PathVariable.class));
+                    }
                     GetMapping getMapping = m.getAnnotation(GetMapping.class);
                     key = RequestMethod.GET + key + getMapping.path()[0];
                     //MessageLogger.info(getMapping.path());

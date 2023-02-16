@@ -9,12 +9,12 @@ public class NewController {
     @Autowired
     public ProductService productService;
     @GetMapping(path = "/")
-    public Product getProducts(){
+    public List getProducts(){
         return productService.get();
     }
 
     @GetMapping(path = "/{id}")
-    public Product getByid( int id) {return productService.get(id);}
+    public Product getByid(@PathVariable() Integer id) {return productService.get(id);}
 
     @PostMapping(path = "/")
     public boolean createProduct(Product prod) {return productService.add(prod);}

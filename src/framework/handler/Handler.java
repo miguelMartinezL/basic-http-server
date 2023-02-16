@@ -1,5 +1,6 @@
 package framework.handler;
 
+import application.Product;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import framework.Json;
@@ -37,7 +38,7 @@ public class Handler implements HttpHandler{
             case "GET":
                 try{
                     Object obj = method.invoke(controller);
-                    String json = Json.toJson(obj);
+                    String json = Json.ArrToJson(obj);
                     httpExchange.sendResponseHeaders(200,json.length());
                     OutputStream outputStream = httpExchange.getResponseBody();
                     outputStream.write(json.getBytes());
@@ -56,6 +57,15 @@ public class Handler implements HttpHandler{
                         {
                             jsonBuff.append(line);
                         }
+                        Object param = Json.fromJson(jsonBuff.toString(), Product.class);
+                        Object obj = method.invoke(controller, param);
+                        String json = Json.toJson(obj);
+
+                        httpExchange.sendResponseHeaders(200,json.length());
+                        OutputStream outputStream = httpExchange.getResponseBody();
+                        outputStream.write(json.getBytes());
+                        outputStream.flush();
+                    outputStream.close();
                 } catch (Exception e){
                     MessageLogger.error(e.getMessage());
                 }

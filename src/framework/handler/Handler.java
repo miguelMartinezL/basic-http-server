@@ -6,9 +6,12 @@ import framework.Json;
 import framework.MessageLogger;
 import framework.context.ComponentScanner;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Handler implements HttpHandler{
@@ -45,9 +48,16 @@ public class Handler implements HttpHandler{
                 }
             case "POST":
                 try{
-
+                    InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8);
+                    StringBuilder jsonBuff = new StringBuilder();
+                        BufferedReader br = new BufferedReader(isr);
+                        String line;
+                        while ((line = br.readLine()) != null)
+                        {
+                            jsonBuff.append(line);
+                        }
                 } catch (Exception e){
-
+                    MessageLogger.error(e.getMessage());
                 }
         }
     }

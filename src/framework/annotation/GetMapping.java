@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface GetMapping {
     String name() default "";
     String[] value() default {};
-    String path() default "";
+    String[] path() default {};
     String[] params() default {};
     String[] headers() default {};
     String[] consumes() default {};

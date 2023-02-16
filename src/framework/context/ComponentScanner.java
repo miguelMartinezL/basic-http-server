@@ -156,7 +156,7 @@ public class ComponentScanner {
                 object = objectConstructor.newInstance(null);
 
             } catch (Exception e) {
-                System.err.println(e);
+                MessageLogger.error(e.getMessage());
             }
             context.put(cls, object);
         }
@@ -187,8 +187,14 @@ public class ComponentScanner {
                 String key = reqMapping.path();
                 if(m.isAnnotationPresent(GetMapping.class)){
                     GetMapping getMapping = m.getAnnotation(GetMapping.class);
-                    key = RequestMethod.GET + key + getMapping.path();
-                    MessageLogger.info(getMapping.path());
+                    key = RequestMethod.GET + key + getMapping.path()[0];
+                    //MessageLogger.info(getMapping.path());
+                    methods.put(key, m);
+                }
+                if(m.isAnnotationPresent(PostMapping.class))
+                {
+                    PostMapping postMapping = m.getAnnotation(PostMapping.class);
+                    key = RequestMethod.POST + key + postMapping.path()[0];
                     methods.put(key, m);
                 }
             }

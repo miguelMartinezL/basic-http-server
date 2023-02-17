@@ -26,7 +26,6 @@ public class Json {
     }
     public static String toJson(Object obj) throws Exception{
         Class<?> cls = obj.getClass();
-        System.out.println(cls.getSimpleName());
         Field[] flds =  cls.getDeclaredFields();
         String str = "{";
         String val;

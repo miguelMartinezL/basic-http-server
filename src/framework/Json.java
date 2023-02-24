@@ -8,28 +8,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 
 public class Json {
 
-//    public static String ioJson(InputStream obj) throws IOException
-//    {
-//        StringBuilder jsonBuff = new StringBuilder();
-//        try
-//        {
-//            InputStreamReader isr = new InputStreamReader(obj, "utf-8");
-//            BufferedReader br = new BufferedReader(isr);
-//            String line;
-//            while ((line = br.readLine()) != null)
-//            {
-//                jsonBuff.append(line);
-//            }
-//            return String.valueOf(jsonBuff);
-//        } catch (Exception e)
-//        {
-//            return e.toString();
-//        }
-//    }
+    public static String ArrToJson(Object obj) throws Exception {
+        if(obj.getClass().equals(ArrayList.class)){
+            String response = "{";
+            for (Object element : ((ArrayList<?>) obj).toArray()) {
+                response += Json.toJson(element);
+            }
+            response += "}";
+            return response;
+        }
+        return toJson(obj);
+    }
     public static String toJson(Object obj) throws Exception{
         Class<?> cls = obj.getClass();
         Field[] flds =  cls.getDeclaredFields();

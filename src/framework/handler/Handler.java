@@ -5,10 +5,10 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import framework.Json;
 import framework.MessageLogger;
+import framework.annotation.GetMapping;
 import framework.context.ComponentScanner;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
@@ -16,9 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Handler implements HttpHandler{
-    private Map<String, Method> methods = ComponentScanner.getRestControllerMethods();
+    private final Map<String, Method> methods = ComponentScanner.getRestControllerMethods();
 
-    public void handle(HttpExchange httpExchange) throws IOException
+    public void handle(HttpExchange httpExchange)
     {
 
         for (Map.Entry<String, Method> entry : methods.entrySet()){
@@ -28,16 +28,25 @@ public class Handler implements HttpHandler{
         String reqMethod = httpExchange.getRequestMethod();
         String path = httpExchange.getRequestURI().getPath();
         System.out.println(reqMethod + path);
+        String[] values = path.split("/");
+        int id = 0;
+        if(values.length > 2){
+            int idx = values.length - 1;
+            id = Integer.valueOf(values[idx]);
+            path.replace(values[idx], ComponentScanner.getVar("id"));
+            System.out.println(path);
+        }
 
         Method method = methods.get(reqMethod + path);
-        Class cls = method.getDeclaringClass();
+        Class<?> cls = method.getDeclaringClass();
         Object controller = ComponentScanner.getBean(cls);
         System.out.println(controller.getClass().getSimpleName());
 
         switch(reqMethod){
             case "GET":
                 try{
-                    Object obj = method.invoke(controller);
+                    Object obj;
+                    obj = method.invoke(controller);
                     String json = Json.ArrToJson(obj);
                     httpExchange.sendResponseHeaders(200,json.length());
                     OutputStream outputStream = httpExchange.getResponseBody();

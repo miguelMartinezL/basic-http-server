@@ -14,7 +14,7 @@ public class NewController {
     }
 
     @GetMapping(path = "/{id}")
-    public Product getByid(@PathVariable() Integer id) {return productService.get(id);}
+    public Product getByid(@PathVariable(name = "id") int id) {return productService.get(id);}
 
     @PostMapping(path = "/")
     public boolean createProduct(Product prod) {return productService.add(prod);}

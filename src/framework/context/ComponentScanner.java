@@ -14,6 +14,7 @@ import java.util.*;
 
 public class ComponentScanner {
     private static final Map<Class<?>, Object> context = new HashMap<>();
+    public static final Map<String, String> pathvar = new HashMap<>();
 
     public static List<Class<?>> findFiles(File directory, String pack) {
         List<Class<?>> classes = new ArrayList<>();
@@ -135,6 +136,10 @@ public class ComponentScanner {
         return (T) context.get(cls);
     }
 
+    public static String getVar(String key){
+        return pathvar.get(key);
+    }
+
     public static Map<String, Class<?>> getRestControllers() {
         Map<String, Class<?>> restControllers = new HashMap<>();
         for (Map.Entry<Class<?>, Object> entry : context.entrySet()) {
@@ -158,10 +163,10 @@ public class ComponentScanner {
                         if (param.isAnnotationPresent(PathVariable.class)) {
                             System.out.println(m.getName());
                             PathVariable var = param.getAnnotation(PathVariable.class);
+                            GetMapping getMapping = m.getAnnotation(GetMapping.class);
                             System.out.println("Value = " + var.value() + ", name = " + var.name());
-                            System.out.println(param.getName());
+                            pathvar.put(var.name(),getMapping.path()[0]);
                         }
-                        //System.out.println(par.getAnnotation(PathVariable.class));
                     }
                     GetMapping getMapping = m.getAnnotation(GetMapping.class);
                     key = RequestMethod.GET + key + getMapping.path()[0];

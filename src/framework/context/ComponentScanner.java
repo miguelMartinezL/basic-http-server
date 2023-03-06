@@ -14,10 +14,11 @@ import java.util.*;
 
 public class ComponentScanner {
     private static final Map<Class<?>, Object> context = new HashMap<>();
-    public static final Map<String, String> pathvar = new HashMap<>();
+    public static final Map<String, String> pathVar = new HashMap<>();
 
     public static List<Class<?>> findFiles(File directory, String pack) {
         List<Class<?>> classes = new ArrayList<>();
+
         File[] files = directory.listFiles();
         if(files != null){
             for (File file : files) {
@@ -35,18 +36,18 @@ public class ComponentScanner {
         return classes;
     }
 
+    /**
+     iterate over the file system
+     for each .class file
+     pass the filename to class loader
+     after loading the class we use reflection on it
+     -Controller and Service Annotations
+     Using reflection we check for any of these two annotations
+     and make a decision
+     Map< Class, Object>
+     */
+
     public static void scan(String[] packages) throws IOException {
-        // iterar por el sistema de archivos
-        // cada vez que encuentre un archivo .java
-        /* pasamos ese nombre de archivo al class loader
-        despues de cargar la clase la vamos a inspeccionar usando reflection
-        -anotaciones de controlador y de servicio
-        usando reflection vemos si tiene alguna de estas anotaciones
-         y dependiendo de eso tomar desicion
-         1. un mapa (contexto) que la llave sea el objeto class y  el objeto como tal sea la instanci de esa clase
-         Map< Class, Object>
-         @Autowired busca la clase en el contexto de la aplicacion
-        * */
         for (String pack : packages) {
             ClassLoader cLoader = ClassLoader.getSystemClassLoader();
             assert cLoader != null;
@@ -60,8 +61,8 @@ public class ComponentScanner {
                 fileAddress.add(new File(url.getFile()));
                 System.out.println(url);
             }
-            for (File addr : fileAddress) {
-                classes.addAll(findFiles(addr, pack));
+            for (File address: fileAddress) {
+                classes.addAll(findFiles(address, pack));
             }
             try {
                 init(classes);
@@ -72,22 +73,15 @@ public class ComponentScanner {
     }
 
     /**
-     *         Si es RestController reviso las anotaciones sobro los fields
-     *         si la annotación es Autowired reviso los beans para ver si ya tengo la instancia, se saca del contexto
-     *         y se inyecta
-     *         reviso que esté anotada con service
-     *         se instancia y se inyecta
-     *         se guarda el restcontroller en el contexto.
-     *         Service
-     *         Solamente se instancía
-     *         se guarda en el contexto
-     *
+     *         If it's RestController, checks the annotations over the fields.
+     *         If it is Autowired checks the beans for existence and if not, if not, creates it and injects it.
+     *        Checks for Service annotation and injects it
     */
     public static void init(List<Class<?>> classes) throws ClassNotFoundException {
         for (Class<?> cls : classes) {
             if (cls.isAnnotationPresent(RestController.class) || cls.isAnnotationPresent(Service.class)) {
                 Object bean = getBean(cls);
-                // Obtener campos y checar los que esten anotados con autowired
+                // Gets field and looks for the ones with Autowired annotation
                 Field[] fields = bean.getClass().getDeclaredFields();
                 for (Field fld : fields) {
                     fld.setAccessible(true);
@@ -105,11 +99,11 @@ public class ComponentScanner {
         }
     }
 
-    public static void injector(Object ctrlr, Object dpndncy, String fieldName) {
+    public static void injector(Object controller, Object dependency, String fieldName) {
         try {
-            Field feld = ctrlr.getClass().getField(fieldName);
+            Field field = controller.getClass().getField(fieldName);
             try {
-                feld.set(ctrlr, dpndncy);
+                field.set(controller, dependency);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -136,10 +130,6 @@ public class ComponentScanner {
         return (T) context.get(cls);
     }
 
-    public static String getVar(String key){
-        return pathvar.get(key);
-    }
-
     public static Map<String, Class<?>> getRestControllers() {
         Map<String, Class<?>> restControllers = new HashMap<>();
         for (Map.Entry<Class<?>, Object> entry : context.entrySet()) {
@@ -161,11 +151,11 @@ public class ComponentScanner {
                 if (m.isAnnotationPresent(GetMapping.class)) {
                     for (Parameter param : m.getParameters()) {
                         if (param.isAnnotationPresent(PathVariable.class)) {
-                            System.out.println(m.getName());
+                            //System.out.println(m.getName());
                             PathVariable var = param.getAnnotation(PathVariable.class);
                             GetMapping getMapping = m.getAnnotation(GetMapping.class);
-                            System.out.println("Value = " + var.value() + ", name = " + var.name());
-                            pathvar.put(var.name(),getMapping.path()[0]);
+                            //System.out.println("Value = " + var.value() + ", name = " + var.name());
+                            pathVar.put(var.name(),getMapping.path()[0]);
                         }
                     }
                     GetMapping getMapping = m.getAnnotation(GetMapping.class);

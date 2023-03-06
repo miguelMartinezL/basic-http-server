@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import framework.Json;
 import framework.MessageLogger;
-import framework.annotation.GetMapping;
 import framework.context.ComponentScanner;
 
 import java.io.BufferedReader;
@@ -21,26 +20,13 @@ public class Handler implements HttpHandler{
     public void handle(HttpExchange httpExchange)
     {
 
-        for (Map.Entry<String, Method> entry : methods.entrySet()){
-            System.out.println("key = " + entry.getKey() + " " + "Method = " + entry.getValue().getName());
-        }
-
         String reqMethod = httpExchange.getRequestMethod();
         String path = httpExchange.getRequestURI().getPath();
-        System.out.println(reqMethod + path);
-        String[] values = path.split("/");
-        int id = 0;
-        if(values.length > 2){
-            int idx = values.length - 1;
-            id = Integer.valueOf(values[idx]);
-            path.replace(values[idx], ComponentScanner.getVar("id"));
-            System.out.println(path);
-        }
+
 
         Method method = methods.get(reqMethod + path);
         Class<?> cls = method.getDeclaringClass();
         Object controller = ComponentScanner.getBean(cls);
-        System.out.println(controller.getClass().getSimpleName());
 
         switch(reqMethod){
             case "GET":

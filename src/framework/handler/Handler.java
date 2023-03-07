@@ -14,11 +14,10 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class Handler implements HttpHandler{
+public class Handler implements HttpHandler {
     private final Map<String, Method> methods = ComponentScanner.getRestControllerMethods();
 
-    public void handle(HttpExchange httpExchange)
-    {
+    public void handle(HttpExchange httpExchange) {
 
         String reqMethod = httpExchange.getRequestMethod();
         String path = httpExchange.getRequestURI().getPath();
@@ -28,40 +27,39 @@ public class Handler implements HttpHandler{
         Class<?> cls = method.getDeclaringClass();
         Object controller = ComponentScanner.getBean(cls);
 
-        switch(reqMethod){
+        switch (reqMethod) {
             case "GET":
-                try{
+                try {
                     Object obj;
                     obj = method.invoke(controller);
                     String json = Json.ArrToJson(obj);
-                    httpExchange.sendResponseHeaders(200,json.length());
+                    httpExchange.sendResponseHeaders(200, json.length());
                     OutputStream outputStream = httpExchange.getResponseBody();
                     outputStream.write(json.getBytes());
                     outputStream.flush();
                     outputStream.close();
-                } catch (Exception e){
+                } catch (Exception e) {
                     MessageLogger.error(e.getMessage());
                 }
             case "POST":
-                try{
+                try {
                     InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8);
                     StringBuilder jsonBuff = new StringBuilder();
-                        BufferedReader br = new BufferedReader(isr);
-                        String line;
-                        while ((line = br.readLine()) != null)
-                        {
-                            jsonBuff.append(line);
-                        }
-                        Object param = Json.fromJson(jsonBuff.toString(), Product.class);
-                        Object obj = method.invoke(controller, param);
-                        String json = Json.toJson(obj);
+                    BufferedReader br = new BufferedReader(isr);
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        jsonBuff.append(line);
+                    }
+                    Object param = Json.fromJson(jsonBuff.toString(), Product.class);
+                    Object obj = method.invoke(controller, param);
+                    String json = Json.toJson(obj);
 
-                        httpExchange.sendResponseHeaders(200,json.length());
-                        OutputStream outputStream = httpExchange.getResponseBody();
-                        outputStream.write(json.getBytes());
-                        outputStream.flush();
+                    httpExchange.sendResponseHeaders(200, json.length());
+                    OutputStream outputStream = httpExchange.getResponseBody();
+                    outputStream.write(json.getBytes());
+                    outputStream.flush();
                     outputStream.close();
-                } catch (Exception e){
+                } catch (Exception e) {
                     MessageLogger.error(e.getMessage());
                 }
         }

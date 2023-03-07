@@ -59,7 +59,7 @@ public class ComponentScanner {
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
                 fileAddress.add(new File(url.getFile()));
-                System.out.println(url);
+                //System.out.println(url);
             }
             for (File address: fileAddress) {
                 classes.addAll(findFiles(address, pack));
@@ -113,7 +113,6 @@ public class ComponentScanner {
         }
     }
 
-
     @SuppressWarnings("unchecked")
     public static <T> T getBean(Class<?> cls) {
         if (!context.containsKey(cls)) {
@@ -161,6 +160,7 @@ public class ComponentScanner {
                     GetMapping getMapping = m.getAnnotation(GetMapping.class);
                     key = RequestMethod.GET + key + getMapping.path()[0];
                     //MessageLogger.info(getMapping.path());
+                    // revi
                     methods.put(key, m);
                 }
                 if (m.isAnnotationPresent(PostMapping.class)) {
